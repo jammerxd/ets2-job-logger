@@ -24,3 +24,28 @@ steps:
       - cmake ..
       - make -j$(nproc)
 
+---
+kind: pipeline
+type: docker
+name: Fedora stable
+
+platform:
+  arch: amd64
+  os: linux
+
+steps:
+  - name: submodules
+    image: alpine/git
+    commands:
+      - git submodule init
+      - git submodule update --recursive --remote
+
+  - name: build
+    image: fedora:latest
+    commands:
+      - dnf install -y gcc-g++ pkgconfig cmake msgpack-devel
+        boost-devel websocketpp-devel zlib-devel openssl-devel
+        libcurl-devel jsoncpp-devel wxGTK3-devel
+      - mkdir build && cd build
+      - cmake ..
+      - make -j$(nproc)
