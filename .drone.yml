@@ -1,6 +1,6 @@
 kind: pipeline
 type: docker
-name: Debian stable
+name: Debian
 
 platform:
   arch: amd64
@@ -20,6 +20,31 @@ steps:
       - apt-get install -yq build-essential pkg-config cmake libmsgpack-dev
         libboost-dev libboost-system-dev libwebsocketpp-dev zlib1g-dev
         libcurl4-openssl-dev libssl-dev libjsoncpp-dev libwxgtk3.0-gtk3-dev
+      - mkdir build && cd build
+      - cmake ..
+      - make -j$(nproc)
+
+---
+kind: pipeline
+type: docker
+name: Arch Linux
+
+platform:
+  arch: amd64
+  os: linux
+
+steps:
+  - name: submodules
+    image: alpine/git
+    commands:
+      - git submodule init
+      - git submodule update --recursive --remote
+
+  - name: build
+    image: archlinux:latest
+    commands:
+      - pacman -Syu --noconfirm --noprogressbar gcc pkgconf cmake
+        msgpack-cxx boost websocketpp zlib curl openssl jsoncpp wxgtk3
       - mkdir build && cd build
       - cmake ..
       - make -j$(nproc)
